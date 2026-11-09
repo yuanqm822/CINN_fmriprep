@@ -8,9 +8,9 @@
 #SBATCH --error=logs/mriqc_%A_%a.err
 
 # ---------------- EDIT THESE ----------------
-BIDS=/storage/<project>/bids
-OUT=/storage/<project>/derivatives/mriqc
-WORK=/scratch/$USER/mriqc_work
+BIDS=/scratch5/$USER/<project>/bids
+OUT=//scratch5/$USER/<project>/derivatives/mriqc
+WORK=/scratch5/$USER/mriqc_work
 SUBJECTS=subjects.txt
 # --------------------------------------------
 
