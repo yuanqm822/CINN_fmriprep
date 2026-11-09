@@ -40,9 +40,9 @@ The modules already set:
 - A `subjects.txt` file with one subject ID per line, **without** the `sub-` prefix:
 
 ```
-01
-02
-03
+101
+102
+103
 ```
 
 ## 3. Edit and submit the job script
