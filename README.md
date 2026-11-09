@@ -47,11 +47,15 @@ The modules already set:
 
 ## 3. Edit and submit the job script
 
-Copy the example scripts into your project folder:
+Clone this repository into your project folder on RACC and move into it:
 
 ```bash
-cp /path/to/this/repo/run_fmriprep.sh /path/to/this/repo/run_mriqc.sh .
+cd /scratch5/$USER/<project>
+git clone https://github.com/yuanqm822/CINN_fmriprep_RACC2.git
+cd CINN_fmriprep_RACC2
 ```
+
+Put your `subjects.txt` in this folder (or copy `examples/subjects.txt` and edit it).
 
 Open `run_fmriprep.sh` and change the four lines under `EDIT THESE`:
 your BIDS folder, output folder, work folder and subject list. Then set
