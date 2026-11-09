@@ -8,9 +8,9 @@
 #SBATCH --error=logs/fmriprep_%A_%a.err
 
 # ---------------- EDIT THESE ----------------
-BIDS=/home/scratch/<project>/bids
-OUT=/home/scratch/<project>/derivatives/fmriprep
-WORK=/scratch/$USER/fmriprep_work
+BIDS=/scratch5/$USER/<project>/bids
+OUT=/scratch5/$USER/<project>/derivatives/fmriprep
+WORK=/scratch5/$USER/fmriprep_work
 SUBJECTS=subjects.txt
 # --------------------------------------------
 
