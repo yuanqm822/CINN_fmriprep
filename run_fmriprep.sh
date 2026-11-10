@@ -12,6 +12,22 @@ BIDS=/scratch5/$USER/<project>/bids
 OUT=/scratch5/$USER/<project>/derivatives/fmriprep
 WORK=/scratch5/$USER/fmriprep_work
 SUBJECTS=subjects.txt
+
+# ---------------- OPTIONS -------------------
+# Output spaces (space-separated). Examples:
+#   (MNI152NLin2009cAsym:res-2 T1w)          default volumetric
+#   (fsnative fsaverage)                     surfaces (needs FreeSurfer recon)
+#   (MNI152NLin2009cAsym:res-2 fsaverage5)   volume + surface
+OUTPUT_SPACES=(MNI152NLin2009cAsym:res-2 T1w)
+
+# Any extra fMRIPrep flags, one per item. Examples:
+#   (--force bbr)                 force BBR coregistration (older versions: --force-bbr)
+#   (--fs-no-reconall)            skip FreeSurfer surface reconstruction (faster)
+#   (--cifti-output 91k)          CIFTI grayordinate outputs
+#   (--dummy-scans 4)             drop non-steady-state volumes
+#   (--ignore fieldmaps)          skip susceptibility distortion correction
+#   (--force bbr --cifti-output 91k)   several at once
+EXTRA_ARGS=()
 # --------------------------------------------
 
 set -euo pipefail
@@ -27,13 +43,17 @@ fi
 
 mkdir -p "$OUT" "$WORK/sub-$SUB"
 echo "Running fMRIPrep for sub-$SUB on $(hostname) at $(date)"
+echo "Output spaces: ${OUTPUT_SPACES[*]}"
+echo "Extra args:    ${EXTRA_ARGS[*]} $*"
 
 fmriprep "$BIDS" "$OUT" participant \
     --participant-label "$SUB" \
     -w "$WORK/sub-$SUB" \
     --nprocs "$SLURM_CPUS_PER_TASK" \
     --mem-mb 30000 \
-    --output-spaces MNI152NLin2009cAsym:res-2 T1w \
-    --skip-bids-validation
+    --output-spaces "${OUTPUT_SPACES[@]}" \
+    --skip-bids-validation \
+    "${EXTRA_ARGS[@]}" \
+    "$@"
 
 echo "Finished sub-$SUB at $(date)"

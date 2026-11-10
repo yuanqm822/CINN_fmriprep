@@ -12,6 +12,13 @@ BIDS=/scratch5/$USER/<project>/bids
 OUT=//scratch5/$USER/<project>/derivatives/mriqc
 WORK=/scratch5/$USER/mriqc_work
 SUBJECTS=subjects.txt
+
+# ---------------- OPTIONS -------------------
+# Any extra MRIQC flags, one per item. Examples:
+#   (--modalities T1w bold)       only these modalities
+#   (--fd_thres 0.5)              framewise-displacement threshold (mm)
+#   (--no-datalad-get)            don't try to fetch data with DataLad
+EXTRA_ARGS=()
 # --------------------------------------------
 
 set -euo pipefail
@@ -27,12 +34,15 @@ fi
 
 mkdir -p "$OUT" "$WORK/sub-$SUB"
 echo "Running MRIQC for sub-$SUB on $(hostname) at $(date)"
+echo "Extra args: ${EXTRA_ARGS[*]} $*"
 
 mriqc "$BIDS" "$OUT" participant \
     --participant-label "$SUB" \
     -w "$WORK/sub-$SUB" \
     --nprocs "$SLURM_CPUS_PER_TASK" \
     --mem-gb 14 \
-    --no-sub
+    --no-sub \
+    "${EXTRA_ARGS[@]}" \
+    "$@"
 
 echo "Finished sub-$SUB at $(date)"

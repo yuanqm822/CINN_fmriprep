@@ -74,6 +74,40 @@ sbatch run_fmriprep.sh
 
 Each subject runs as a separate array task, in parallel, as resources become available.
 
+### Adjusting fMRIPrep options
+
+The `OPTIONS` block in `run_fmriprep.sh` controls output spaces and any extra
+fMRIPrep flags. For example, to get FreeSurfer surface outputs and force BBR
+coregistration:
+
+```bash
+OUTPUT_SPACES=(fsnative fsaverage)
+EXTRA_ARGS=(--force bbr)
+```
+
+Other common settings:
+
+| Goal | Setting |
+|------|---------|
+| Volume + surface outputs | `OUTPUT_SPACES=(MNI152NLin2009cAsym:res-2 fsaverage5)` |
+| Skip FreeSurfer (faster, no surfaces) | `EXTRA_ARGS=(--fs-no-reconall)` |
+| CIFTI grayordinates | `EXTRA_ARGS=(--cifti-output 91k)` |
+| Drop dummy scans | `EXTRA_ARGS=(--dummy-scans 4)` |
+| Skip distortion correction | `EXTRA_ARGS=(--ignore fieldmaps)` |
+| Several at once | `EXTRA_ARGS=(--force bbr --cifti-output 91k)` |
+
+For a one-off change you can also pass flags at submission without editing the
+script. They are added to the end of the fMRIPrep command:
+
+```bash
+sbatch run_fmriprep.sh --force bbr --dummy-scans 4
+```
+
+Surface spaces (`fsnative`, `fsaverage*`, `fsLR`) need FreeSurfer reconstruction,
+so don't combine them with `--fs-no-reconall`. The full list of flags is at
+<https://fmriprep.org/en/stable/usage.html>. `run_mriqc.sh` has the same
+`EXTRA_ARGS` option.
+
 MRIQC works the same way with `run_mriqc.sh`. When all participant jobs have
 finished, run the group report once:
 
