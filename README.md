@@ -32,7 +32,7 @@ module avail fmriprep mriqc
 The modules already set:
 
 - the shared FreeSurfer licence (`FS_LICENSE`) — no need for `--fs-license-file`
-- container bind paths for `/software`, `/home`, `/storage` and `/scratch`
+- container bind paths for `/software`, `/home`, `/storage`, `/scratch2`, `/scratch3`, `/scratch4`, `/scratch5`, `/scratch6`.
 
 ## 2. Prepare your data
 
@@ -51,8 +51,8 @@ Clone this repository into your project folder on RACC and move into it:
 
 ```bash
 cd /scratch5/$USER/<project>
-git clone https://github.com/yuanqm822/CINN_fmriprep_RACC.git
-cd CINN_fmriprep_RACC
+git clone https://github.com/yuanqm822/CINN_fmriprep.git
+cd CINN_fmriprep
 ```
 
 Put your `subjects.txt` in this folder (or copy `examples/subjects.txt` and edit it).
