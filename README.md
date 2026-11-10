@@ -138,11 +138,15 @@ more time rather than less — a job killed at the time limit has to restart.
 
 ## 6. Tips and troubleshooting
 
-- **Work directory:** keep `-w` on `/scratch`, not `/home` — it gets large. Delete it
-  once a subject has finished successfully.
+- **Work directory:** keep `-w` on a scratch volume (e.g. `/scratch5`), not `/home` —
+  it gets large. Delete it once a subject has finished successfully.
+- **Log files:** jobs will fail straight away, without writing any output, if the
+  `logs/` folder doesn't exist, so run `mkdir -p logs` before `sbatch`. Each subject
+  gets `logs/fmriprep_<jobid>_<task>.out` (progress) and `.err` (errors). Check the
+  `.err` file first when a job fails.
 - **"File not found" for a path that exists:** the container can only see bound
-  folders. If your data live outside `/software`, `/home`, `/storage` or `/scratch`,
-  add the path before running:
+  folders. If your data live outside `/software`, `/home`, `/storage` or
+  `/scratch2`–`/scratch6`, add the path before running:
   `export APPTAINER_BINDPATH="$APPTAINER_BINDPATH,/other/path"`
 - **MRIQC hangs or fails at the end:** always use `--no-sub`; compute nodes cannot
   upload metrics to the MRIQC web API.
