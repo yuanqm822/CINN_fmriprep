@@ -1,4 +1,4 @@
-# Running fMRIPrep and MRIQC on RACC2 (CINN)
+# Running fMRIPrep and MRIQC on RACC (CINN)
 
 fMRIPrep and MRIQC are installed on RACC as CINN modules (Neurodesk containers via
 Transparent Singularity). You do **not** need to clone a package, build a conda
@@ -36,7 +36,7 @@ The modules already set:
 
 ## 2. Prepare your data
 
-- A valid BIDS dataset (e.g. made with `module load bidscoin/4.6.2`)
+- A valid BIDS dataset (e.g. made with bidscoin) <https://bidscoin.readthedocs.io/en/stable/preparation.html>
 - A `subjects.txt` file with one subject ID per line, **without** the `sub-` prefix:
 
 ```
@@ -51,8 +51,8 @@ Clone this repository into your project folder on RACC and move into it:
 
 ```bash
 cd /scratch5/$USER/<project>
-git clone https://github.com/yuanqm822/CINN_fmriprep_RACC2.git
-cd CINN_fmriprep_RACC2
+git clone https://github.com/yuanqm822/CINN_fmriprep_RACC.git
+cd CINN_fmriprep_RACC
 ```
 
 Put your `subjects.txt` in this folder (or copy `examples/subjects.txt` and edit it).
@@ -89,7 +89,7 @@ squeue -u $USER                     # running / pending jobs
 sacct -j <jobid> --format=JobID,State,Elapsed,MaxRSS
 tail -f logs/fmriprep_<jobid>_1.out # follow one subject's log
 scancel <jobid>                     # cancel all tasks in an array
-scancel <jobid>_3                   # cancel one task
+scancel <jobid>_1                   # cancel one task
 ```
 
 Outputs appear in your output folder; the HTML report for each subject
@@ -127,4 +127,4 @@ more time rather than less — a job killed at the time limit has to restart.
 Based on Nick Hedger's original guide and `CINN_fmriprep` package for running
 fMRIPrep on RACC2.
 
-Questions or problems: contact Simon Yuan (CINN).
+Questions or problems: contact Dr Simon Yuan (simon.yuan@reading.ac.uk).
