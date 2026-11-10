@@ -1,6 +1,6 @@
 # Running fMRIPrep and MRIQC on RACC (CINN)
 
-fMRIPrep and MRIQC are installed on RACC as CINN modules (Neurodesk containers via
+fMRIPrep and MRIQC are installed on RACC (University of Reading) as CINN (Centre for Integrative Neuroscience and Neurodynamics) modules (Neurodesk containers via
 Transparent Singularity). You do **not** need to clone a package, build a conda
 environment, or download containers yourself — load the module and submit a Slurm job.
 
