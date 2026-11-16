@@ -35,10 +35,9 @@ The modules already set:
 - the shared FreeSurfer licence (`FS_LICENSE`) — no need for `--fs-license-file`
 - container bind paths for `/software`, `/home`, `/storage`, `/scratch2`, `/scratch3`, `/scratch4`, `/scratch5`, `/scratch6`.
 - a shared TemplateFlow folder (`TEMPLATEFLOW_HOME=/software/CINN/templateflow`) with the
-  templates and atlases pre-downloaded, so jobs don't download anything on compute nodes
-  and fMRIPrep, MRIQC and Nilearn use the same template files.
-  If a job fails with a TemplateFlow error naming a missing template, ask the CINN admin
-  to add it.
+  common templates and atlases pre-downloaded, so fMRIPrep, MRIQC and Nilearn use the
+  same template files. Jobs look there first and only download a template that is
+  missing, which is then saved in the shared folder for everyone.
 
 ## 2. Prepare your data
 
@@ -154,8 +153,8 @@ more time rather than less — a job killed at the time limit has to restart.
   folders. If your data live outside `/software`, `/home`, `/storage` or
   `/scratch2`–`/scratch6`, add the path before running:
   `export APPTAINER_BINDPATH="$APPTAINER_BINDPATH,/other/path"`
-- **MRIQC hangs or fails at the end:** always use `--no-sub`; compute nodes cannot
-  upload metrics to the MRIQC web API.
+- **MRIQC `--no-sub`:** keep this flag. Without it, MRIQC uploads anonymised quality
+  metrics to its public web API at the end of each run.
 - **Re-running a subject:** reusing the same work directory lets fMRIPrep pick up
   where it stopped.
 - **Help text:** `module help fmriprep/25.2.7`
@@ -167,7 +166,7 @@ computes a functional connectome for each run, following the workflow of
 Wang et al. (2024). It uses `nilearn/1.0`, a CINN Python environment (built with
 pixi) that contains Nilearn and TemplateFlow, so there is no conda environment to
 set up. The Schaefer 2018 atlases are pre-downloaded to the shared TemplateFlow
-folder, so jobs work on compute nodes without internet.
+folder.
 
 For each run it:
 

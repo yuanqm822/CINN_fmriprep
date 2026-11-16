@@ -58,11 +58,11 @@ a = p.parse_args()
 sub = a.subject.removeprefix("sub-")
 os.makedirs(a.output_dir, exist_ok=True)
 
-# ---- atlas from the shared TemplateFlow folder (no internet needed) ----------
+# ---- atlas from the shared TemplateFlow folder (downloaded there if missing) ----
 atlas = tf.get(SPACE, resolution=a.resolution, atlas="Schaefer2018",
                desc=f"{a.atlas}Parcels7Networks", suffix="dseg", extension=".nii.gz")
 if not atlas:
-    raise SystemExit(f"Schaefer {a.atlas} atlas not found in $TEMPLATEFLOW_HOME - ask the CINN admin to fetch it")
+    raise SystemExit(f"Schaefer {a.atlas} atlas not found in $TEMPLATEFLOW_HOME and could not be downloaded")
 labels_tsv = str(atlas).replace("_dseg.nii.gz", "_dseg.tsv")
 labels = (pd.read_csv(labels_tsv, sep="\t")["name"].tolist()
           if os.path.exists(labels_tsv) else [f"roi{i + 1}" for i in range(a.atlas)])
