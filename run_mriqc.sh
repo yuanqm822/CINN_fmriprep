@@ -2,8 +2,8 @@
 #SBATCH --job-name=mriqc
 #SBATCH --array=1-3                 # 1-N, N = number of lines in subjects.txt
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=16G
-#SBATCH --time=04:00:00
+#SBATCH --mem=32G
+#SBATCH --time=12:00:00
 #SBATCH --output=logs/mriqc_%A_%a.out
 #SBATCH --error=logs/mriqc_%A_%a.err
 
