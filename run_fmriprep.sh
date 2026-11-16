@@ -10,8 +10,8 @@
 # ---------------- EDIT THESE ----------------
 BIDS=/scratch5/$USER/<project>/bids
 OUT=/scratch5/$USER/<project>/derivatives/fmriprep
-WORK=/scratch5/$USER/fmriprep_work
-SUBJECTS=subjects.txt
+WORK=/scratch5/$USER/<project>/fmriprep_work
+SUBJECTS=/scratch5/$USER/<project>/subjects.txt
 
 # ---------------- OPTIONS -------------------
 # Output spaces (space-separated). Examples:
