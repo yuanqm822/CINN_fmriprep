@@ -223,6 +223,50 @@ Outputs in your connectome folder, per run:
 - `*_connectome.tsv` — region × region correlation matrix, with region names
 - `*_desc.json` — strategy, number of confound regressors and volumes kept
 
+To compare strategies (needed for Step 3), submit the job once per strategy. Flags
+given at submission override the `OPTIONS` line:
+
+```bash
+for s in "--strategy baseline" \
+         "--strategy simple" "--strategy simple --global-signal basic" \
+         "--strategy scrubbing --fd-threshold 0.5" "--strategy scrubbing --fd-threshold 0.2" \
+         "--strategy compcor"; do
+    sbatch run_connectome.sh $s
+done
+```
+
+### Step 3: group benchmark (whole sample)
+
+Once motion QC and connectomes are done for **all** subjects, `run_group_metrics.sh`
+compares the strategies with the four metrics from Wang et al. (2024):
+
+| Metric | What it measures | Better |
+|--------|------------------|--------|
+| Loss of tDOF | confound regressors + censored volumes | lower |
+| QC-FC | partial correlation between subjects' mean FD and each edge, controlling for age and sex (% significant edges, uncorrected and FDR; median \|r\|) | lower |
+| DM-FC | Spearman correlation between region distance and QC-FC | closer to 0 |
+| Modularity | mean Louvain modularity of each subject's connectome | higher |
+
+Runs flagged by `motion_qc.py` are left out, and a subject's runs are averaged.
+Age and sex come from the BIDS `participants.tsv`; the script uses the first column
+whose name starts with `age` (e.g. `age@ses-01` from BIDScoin) unless you set
+`AGE_COL`. Edit the paths at the top of `run_group_metrics.sh`, then:
+
+```bash
+sbatch run_group_metrics.sh
+```
+
+Outputs in `<connectome folder>/group/`:
+
+- `group_metrics.tsv` — one row per atlas × strategy, with ranks per metric (as in the paper's Fig 12)
+- `group_metrics.png` — bar charts of each metric
+- `qcfc_<atlas>_<strategy>.tsv` — per-edge QC-FC, distance and p-value
+
+These are group statistics: with fewer than ~20 subjects the script warns that the
+numbers are unreliable. As in the paper, no single "best" strategy is computed —
+weigh motion removal (QC-FC, DM-FC) against data lost (tDOF), and choose before
+looking at your effects of interest.
+
 Notes:
 
 - **Simple + GSR** keeps every volume, which you need for any analysis that relies on
