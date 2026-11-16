@@ -1,0 +1,18 @@
+# Definition of the CINN nilearn/1.0 environment (installed by the CINN admin at
+# /software/CINN/envs/nilearn-1.0). Users do NOT need to build this:
+# just `module load nilearn/1.0`.
+#
+# To rebuild:
+#   cp pixi.toml /software/CINN/envs/nilearn-1.0/ && cd /software/CINN/envs/nilearn-1.0
+#   /software/CINN/pixi/bin/pixi install
+[workspace]
+name = "nilearn-1.0"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[dependencies]
+python = "3.12.*"
+nilearn = "*"
+templateflow = "*"
+pandas = "*"
+matplotlib = "*"

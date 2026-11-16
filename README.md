@@ -11,6 +11,7 @@ environment, or download containers yourself — load the module and submit a Sl
 |----------|-------------------|
 | fMRIPrep | `fmriprep/25.2.7` |
 | MRIQC    | `mriqc/26.1.0`    |
+| Nilearn (connectivity) | `nilearn/1.0` |
 
 ---
 
@@ -154,10 +155,88 @@ more time rather than less — a job killed at the time limit has to restart.
   where it stopped.
 - **Help text:** `module help fmriprep/25.2.7`
 
+## 7. Next step: functional connectivity with Nilearn
+
+After fMRIPrep, `run_connectome.sh` denoises the preprocessed resting-state data and
+computes a functional connectome for each run, following the workflow of
+Wang et al. (2024). It uses `nilearn/1.0`, a CINN Python environment (built with
+pixi) that contains Nilearn and TemplateFlow, so there is no conda environment to
+set up. The Schaefer 2018 atlases are pre-downloaded to the shared TemplateFlow
+folder, so jobs work on compute nodes without internet.
+
+For each run it:
+
+1. selects confounds from fMRIPrep's `desc-confounds_timeseries.tsv` with
+   `load_confounds_strategy`
+2. extracts denoised Schaefer-atlas time series (`NiftiLabelsMasker`)
+3. computes a correlation matrix (`ConnectivityMeasure`)
+
+It needs fMRIPrep outputs in `MNI152NLin2009cAsym:res-2`, which the default
+`OUTPUT_SPACES` in `run_fmriprep.sh` already produces.
+
+Edit the paths under `EDIT THESE` in `run_connectome.sh`, set `--array`, then:
+
+```bash
+mkdir -p logs
+sbatch run_connectome.sh
+```
+
+Choose the denoising strategy in the `OPTIONS` line:
+
+| Strategy | `OPTIONS` | What it removes |
+|----------|-----------|-----------------|
+| simple + GSR (default) | `--strategy simple --global-signal basic` | motion, WM/CSF, global signal, low-frequency drift |
+| simple | `--strategy simple` | as above, without global signal |
+| scrubbing | `--strategy scrubbing --fd-threshold 0.5` | as simple, plus censoring of high-motion volumes |
+| CompCor | `--strategy compcor` | motion and anatomical CompCor components |
+
+Other options: `--atlas 100|200|300|400|...` (Schaefer parcels, 7 networks) and
+`--task` (default `rest`). One-off changes can also be passed at submission, e.g.
+`sbatch run_connectome.sh --atlas 200`.
+
+Outputs in your connectome folder, per run:
+
+- `*_timeseries.tsv` — denoised time series, one column per region
+- `*_connectome.tsv` — region × region correlation matrix, with region names
+- `*_desc.json` — strategy, number of confound regressors and volumes kept
+
+Notes:
+
+- **Simple + GSR** keeps every volume, which you need for any analysis that relies on
+  a continuous time series. Wang et al. found it to be a good choice in that case.
+- **Scrubbing with multiband data:** at short TRs, respiration inflates framewise
+  displacement, so a strict threshold (e.g. 0.2 mm) can remove a large share of
+  volumes. The script defaults to 0.5 mm and warns if more than half of a run is
+  removed. Check `volumes_kept` in `*_desc.json`.
+- To adapt the analysis, copy `connectome.py` and edit it. Run it with
+  `module load nilearn/1.0` then `python connectome.py --help`.
+
+<details>
+<summary>For the CINN admin: how <code>nilearn/1.0</code> is installed</summary>
+
+The environment is defined in [`envs/nilearn/pixi.toml`](envs/nilearn/pixi.toml) and
+built with CINN's own pixi under `/software/CINN/pixi`:
+
+```bash
+export PIXI_CACHE_DIR=/scratch5/$USER/pixi_cache   # keep the cache out of /home
+mkdir -p /software/CINN/envs/nilearn-1.0
+cp envs/nilearn/pixi.toml /software/CINN/envs/nilearn-1.0/
+cd /software/CINN/envs/nilearn-1.0 && /software/CINN/pixi/bin/pixi install
+chmod -R a+rX /software/CINN/envs/nilearn-1.0
+```
+
+The module `/software/modules/CINN/nilearn/1.0` puts
+`/software/CINN/envs/nilearn-1.0/.pixi/envs/default/bin` on `PATH` and sets
+`TEMPLATEFLOW_HOME=/software/CINN/templateflow`. New versions go in a new folder
+(e.g. `nilearn-1.1`) so existing analyses keep the same package versions.
+</details>
+
 ## Documentation
 
 - fMRIPrep: <https://fmriprep.org/en/stable/>
 - MRIQC: <https://mriqc.readthedocs.io>
+- Nilearn: <https://nilearn.github.io>
+- Wang H-T et al. (2024) Continuous evaluation of denoising strategies in resting-state fMRI connectivity using fMRIPrep and Nilearn. *PLOS Comput Biol* 20(3): e1011942. <https://doi.org/10.1371/journal.pcbi.1011942>
 - Transparent Singularity: <https://neurodesk.org/developers/architecture/transparent-singularity/>
 
 ## Acknowledgements
