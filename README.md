@@ -34,6 +34,11 @@ The modules already set:
 
 - the shared FreeSurfer licence (`FS_LICENSE`) — no need for `--fs-license-file`
 - container bind paths for `/software`, `/home`, `/storage`, `/scratch2`, `/scratch3`, `/scratch4`, `/scratch5`, `/scratch6`.
+- a shared TemplateFlow folder (`TEMPLATEFLOW_HOME=/software/CINN/templateflow`) with the
+  templates and atlases pre-downloaded, so jobs don't download anything on compute nodes
+  (which have no internet) and fMRIPrep, MRIQC and Nilearn use the same template files.
+  If a job fails with a TemplateFlow error naming a missing template, ask the CINN admin
+  to add it.
 
 ## 2. Prepare your data
 
