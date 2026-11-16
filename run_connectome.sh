@@ -15,6 +15,7 @@ SUBJECTS=subjects.txt
 
 # ---------------- OPTIONS -------------------
 # Denoising options passed to connectome.py. Examples:
+#   (--strategy baseline)                            high-pass only (reference)
 #   (--strategy simple)                              motion + WM/CSF + high-pass
 #   (--strategy simple --global-signal basic)        ... + global signal regression
 #   (--strategy scrubbing --fd-threshold 0.5)        volume censoring

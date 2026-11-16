@@ -174,6 +174,27 @@ For each run it:
 It needs fMRIPrep outputs in `MNI152NLin2009cAsym:res-2`, which the default
 `OUTPUT_SPACES` in `run_fmriprep.sh` already produces.
 
+### Step 1: motion quality control
+
+Before computing connectomes, check which runs pass the motion criteria used by
+Wang et al. (2024). A run is flagged if mean framewise displacement (FD) is above
+0.25 mm, if scrubbing at FD 0.2 mm removes more than 80% of volumes, or if less than
+1 minute of data is left. It only reads fMRIPrep's confounds files, so it runs in
+seconds on the login node:
+
+```bash
+module load nilearn/1.0
+python motion_qc.py /scratch5/$USER/<project>/derivatives/fmriprep --task rest
+```
+
+It prints a summary and writes `motion_qc_task-rest.tsv` (mean/max FD, % volumes
+removed, minutes left, `exclude` and the reason) into the fMRIPrep folder. Leave
+flagged runs out of later analyses. The paper's data had a TR of 2–2.5 s; with
+multiband data (e.g. TR 0.8 s), respiration inflates FD, so check the numbers rather
+than relying only on the flag.
+
+### Step 2: connectomes
+
 Edit the paths under `EDIT THESE` in `run_connectome.sh`, set `--array`, then:
 
 ```bash
@@ -185,9 +206,11 @@ Choose the denoising strategy in the `OPTIONS` line:
 
 | Strategy | `OPTIONS` | What it removes |
 |----------|-----------|-----------------|
+| baseline | `--strategy baseline` | low-frequency drift only (the paper's reference) |
 | simple + GSR (default) | `--strategy simple --global-signal basic` | motion, WM/CSF, global signal, low-frequency drift |
 | simple | `--strategy simple` | as above, without global signal |
-| scrubbing | `--strategy scrubbing --fd-threshold 0.5` | as simple, plus censoring of high-motion volumes |
+| scrubbing | `--strategy scrubbing --fd-threshold 0.5` | full motion + WM/CSF, plus censoring of volumes with FD > 0.5 mm |
+| scrubbing (strict) | `--strategy scrubbing --fd-threshold 0.2` | as above with FD > 0.2 mm |
 | CompCor | `--strategy compcor` | motion and anatomical CompCor components |
 
 Other options: `--atlas 100|200|300|400|...` (Schaefer parcels, 7 networks) and
@@ -208,6 +231,11 @@ Notes:
   displacement, so a strict threshold (e.g. 0.2 mm) can remove a large share of
   volumes. The script defaults to 0.5 mm and warns if more than half of a run is
   removed. Check `volumes_kept` in `*_desc.json`.
+- **Scrubbing uses FD only**, as in the paper (no DVARS threshold). Add
+  `--dvars-threshold 1.5` to also censor on DVARS. Runs with fewer than 10 volumes
+  left after scrubbing are skipped.
+- **ICA-AROMA** (in the paper) is not available: fMRIPrep stopped producing it from
+  version 23.1.
 - To adapt the analysis, copy `connectome.py` and edit it. Run it with
   `module load nilearn/1.0` then `python connectome.py --help`.
 
