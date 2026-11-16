@@ -2,7 +2,7 @@
 #SBATCH --job-name=connectome
 #SBATCH --array=1-3                 # 1-N, N = number of lines in subjects.txt
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/connectome_%A_%a.out
 #SBATCH --error=logs/connectome_%A_%a.err
