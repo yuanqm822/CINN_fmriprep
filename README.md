@@ -36,8 +36,8 @@ The modules already set:
 - container bind paths for `/software`, `/home`, `/storage`, `/scratch2`, `/scratch3`, `/scratch4`, `/scratch5`, `/scratch6`.
 - a shared TemplateFlow folder (`TEMPLATEFLOW_HOME=/software/CINN/templateflow`) with the
   common templates and atlases pre-downloaded, so fMRIPrep, MRIQC and Nilearn use the
-  same template files. Jobs look there first and only download a template that is
-  missing, which is then saved in the shared folder for everyone.
+  same template files. The shared folder is read-only; see *Need a template that isn't
+  there?* in section 6.
 
 ## 2. Prepare your data
 
@@ -157,6 +157,24 @@ more time rather than less — a job killed at the time limit has to restart.
   metrics to its public web API at the end of each run.
 - **Re-running a subject:** reusing the same work directory lets fMRIPrep pick up
   where it stopped.
+- **Need a template that isn't there?** A job that uses a template or atlas missing from
+  the shared TemplateFlow folder fails with a permission error, because only the CINN
+  admin can write to it. Either ask Simon to add it (it then becomes available to
+  everyone), or use your own TemplateFlow folder that links to the shared templates
+  and downloads anything new into your space:
+
+  ```bash
+  MYTF=/scratch5/$USER/templateflow
+  cp -rs /software/CINN/templateflow/. "$MYTF"/        # links, takes no space
+  find "$MYTF" -type d -exec chmod u+w {} +           # allow new downloads
+  ```
+
+  Then add these lines to your job script, after the `module load` lines:
+
+  ```bash
+  export TEMPLATEFLOW_HOME=$MYTF
+  export SINGULARITYENV_TEMPLATEFLOW_HOME=$MYTF APPTAINERENV_TEMPLATEFLOW_HOME=$MYTF
+  ```
 - **Help text:** `module help fmriprep/25.2.7`
 
 ## 7. Next step: functional connectivity with Nilearn
