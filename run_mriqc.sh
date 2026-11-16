@@ -9,9 +9,9 @@
 
 # ---------------- EDIT THESE ----------------
 BIDS=/scratch5/$USER/<project>/bids
-OUT=//scratch5/$USER/<project>/derivatives/mriqc
-WORK=/scratch5/$USER/mriqc_work
-SUBJECTS=subjects.txt
+OUT=/scratch5/$USER/<project>/derivatives/mriqc
+WORK=/scratch5/$USER/<project>/mriqc_work
+SUBJECTS=/scratch5/$USER/<project>/subjects.txt
 
 # ---------------- OPTIONS -------------------
 # Any extra MRIQC flags, one per item. Examples:
