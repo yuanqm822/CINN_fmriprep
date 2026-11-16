@@ -11,7 +11,7 @@ environment, or download containers yourself — load the module and submit a Sl
 |----------|-------------------|
 | fMRIPrep | `fmriprep/25.2.7` |
 | MRIQC    | `mriqc/26.1.0`    |
-| Nilearn (connectivity) | `nilearn/1.0` |
+| Nilearn (statistical & ML toolbox) | `nilearn/1.0` |
 
 ---
 
