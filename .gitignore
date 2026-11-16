@@ -1,3 +1,5 @@
 logs/
 *.out
 *.err
+__pycache__/
+*.pyc

@@ -10,7 +10,7 @@
 # ---------------- EDIT THESE ----------------
 FMRIPREP=/scratch5/$USER/<project>/derivatives/fmriprep
 OUT=/scratch5/$USER/<project>/derivatives/connectome
-SUBJECTS=subjects.txt
+SUBJECTS=../subjects.txt
 # --------------------------------------------
 
 # ---------------- OPTIONS -------------------
