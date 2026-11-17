@@ -6,6 +6,7 @@
 All commands below are run from this folder:
 
 ```bash
+git clone https://github.com/yuanqm822/CINN_fmriprep.git
 cd CINN_fmriprep/connectivity
 mkdir -p logs
 ```
