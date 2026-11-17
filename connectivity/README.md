@@ -1,8 +1,7 @@
 # Denoising and Functional connectivity of rs-fMRI data with Nilearn
 
 > This chapter extends the [main guide](../README.md): it starts from fMRIPrep outputs
-> and is still being developed. Scripts and defaults may change — check the
-> [roadmap](#roadmap) and contact Simon before relying on it for a study.
+> and is still being developed.
 
 All commands below are run from this folder:
 
@@ -76,6 +75,7 @@ Other options: `--atlas 100|200|300|400|...` (Schaefer parcels, 7 networks) and
 `sbatch run_connectome.sh --atlas 200`.
 
 The choice of denoising strategy depends on your data and the type of your further analysis. There is no right or wrong answer. I recommend you seek advise before proceeding any of the choice.
+Also, the section 3 gives you a guide on how to evaluate different denoising strategies with your group sample.
 
 Outputs in your connectome folder, per run:
 
@@ -142,36 +142,6 @@ Notes:
   version 23.1.
 - To adapt the analysis, copy `connectome.py` and edit it. Run it with
   `module load nilearn/1.0` then `python connectome.py --help`.
-
-<details>
-<summary>For the CINN admin: how <code>nilearn/1.0</code> is installed</summary>
-
-The environment is defined in [`env/pixi.toml`](env/pixi.toml) and
-built with CINN's own pixi under `/software/CINN/pixi`:
-
-```bash
-export PIXI_CACHE_DIR=/scratch5/$USER/pixi_cache   # keep the cache out of /home
-mkdir -p /software/CINN/envs/nilearn-1.0
-cp env/pixi.toml /software/CINN/envs/nilearn-1.0/
-cd /software/CINN/envs/nilearn-1.0 && /software/CINN/pixi/bin/pixi install
-chmod -R a+rX /software/CINN/envs/nilearn-1.0
-```
-
-The module `/software/modules/CINN/nilearn/1.0` puts
-`/software/CINN/envs/nilearn-1.0/.pixi/envs/default/bin` on `PATH` and sets
-`TEMPLATEFLOW_HOME=/software/CINN/templateflow`. New versions go in a new folder
-(e.g. `nilearn-1.1`) so existing analyses keep the same package versions.
-</details>
-
-## Roadmap
-
-Planned or possible next steps (edit as the chapter develops):
-
-- [ ] Test on the first CINN group dataset and settle default thresholds for multiband data (TR 0.8 s)
-- [ ] More atlases from the paper: Gordon 333, MIST, DiFuMo (probabilistic, `NiftiMapsMasker`)
-- [ ] Optional physiological / respiration-related confounds for multiband data
-- [ ] Task-based connectivity (e.g. task-regressed residuals)
-- [ ] Packaged option: giga-connectome BIDS app as a CINN module
 
 ## References
 
