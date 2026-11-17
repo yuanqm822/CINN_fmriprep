@@ -19,6 +19,18 @@ Usage (inside `module load nilearn/1.0`):
     python motion_qc.py <fmriprep_dir> [--task rest] [--out motion_qc.tsv]
 
 Writes one row per run and prints a summary; runs for all subjects found.
+
+Optionally (--save-confounds DIR) it also saves, for every run, the confound
+regressors chosen with Nilearn's load_confounds, e.g. for your own GLM:
+    python motion_qc.py <fmriprep_dir> --save-confounds <dir> \
+        --motion full --wm-csf full --global-signal basic
+Levels for --motion / --wm-csf / --global-signal:
+    basic        original parameters                    (motion: 6, wm_csf: 2)
+    power2       + quadratic terms                      (12, 4)
+    derivatives  + 1st temporal derivatives             (12, 4)
+    full         + derivatives + quadratic terms of     (24, 8)
+                   both parameters and derivatives
+High-pass (cosine) regressors are included unless --no-high-pass.
 """
 import argparse
 import glob
@@ -29,7 +41,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from nilearn.interfaces.fmriprep import load_confounds_strategy
+from nilearn.interfaces.fmriprep import load_confounds, load_confounds_strategy
 
 SPACE = "MNI152NLin2009cAsym"
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -44,7 +56,23 @@ p.add_argument("--mean-fd", type=float, default=0.25, help="max mean FD in mm (d
 p.add_argument("--scrub-fd", type=float, default=0.2, help="FD threshold for scrubbing check (default: 0.2)")
 p.add_argument("--max-removed", type=float, default=0.8, help="max fraction removed (default: 0.8)")
 p.add_argument("--min-minutes", type=float, default=1.0, help="min data left in minutes (default: 1)")
+LEVELS = ["basic", "power2", "derivatives", "full"]
+g = p.add_argument_group("saving confound regressors (optional)")
+g.add_argument("--save-confounds", metavar="DIR", default=None,
+               help="also save the selected confounds of every run to DIR")
+g.add_argument("--motion", choices=LEVELS, default="full", help="motion parameters (default: full = 24)")
+g.add_argument("--wm-csf", choices=LEVELS, default="basic", help="WM/CSF signals (default: basic = 2)")
+g.add_argument("--global-signal", choices=LEVELS, default=None, help="global signal (default: not included)")
+g.add_argument("--no-high-pass", action="store_true", help="leave out the cosine high-pass regressors")
 a = p.parse_args()
+
+if a.save_confounds:
+    os.makedirs(a.save_confounds, exist_ok=True)
+    conf_strategy = (["high_pass"] if not a.no_high_pass else []) + ["motion", "wm_csf"]
+    conf_kw = dict(motion=a.motion, wm_csf=a.wm_csf)
+    if a.global_signal:
+        conf_strategy.append("global_signal"); conf_kw["global_signal"] = a.global_signal
+    conf_desc = f"motion{a.motion}wmcsf{a.wm_csf}" + (f"gs{a.global_signal}" if a.global_signal else "")
 
 bolds = sorted(glob.glob(f"{a.fmriprep_dir}/sub-*/**/func/*_task-{a.task}_*"
                          f"space-{SPACE}*desc-preproc_bold.nii.gz", recursive=True))
@@ -81,6 +109,14 @@ for key, bold in runs.items():
     if tr and minutes_left < a.min_minutes:
         reasons.append(f"{minutes_left:.2f} min left")
 
+    if a.save_confounds:
+        conf, _ = load_confounds(bold, strategy=conf_strategy, **conf_kw)
+        stem = os.path.join(a.save_confounds, f"{key}_desc-{conf_desc}_confounds")
+        conf.to_csv(f"{stem}.tsv", sep="\t", index=False)
+        with open(f"{stem}.json", "w") as fh:
+            json.dump(dict(source=os.path.basename(conf_tsv), strategy=conf_strategy, **conf_kw,
+                           n_regressors=conf.shape[1], columns=list(conf.columns)), fh, indent=2)
+
     rows.append(dict(run=key, TR=tr, volumes=n, mean_FD=round(fd.mean(), 4),
                      max_FD=round(fd.max(), 4),
                      pct_FD_over_thresh=round(100 * (fd > a.scrub_fd).mean(), 1),
@@ -96,3 +132,5 @@ with pd.option_context("display.width", 200, "display.max_columns", 20):
     print(df[["run", "mean_FD", "pct_removed_scrubbing", "minutes_left", "exclude", "reason"]]
           .to_string(index=False))
 print(f"\n{df.exclude.sum()} of {len(df)} runs flagged for exclusion. Full table: {out}")
+if a.save_confounds:
+    print(f"Saved {conf_desc} confounds ({', '.join(conf_strategy)}) for {len(df)} runs in {a.save_confounds}")

@@ -50,6 +50,29 @@ flagged runs out of later analyses. The paper's data had a TR of 2–2.5 s; with
 multiband data (e.g. TR 0.8 s), respiration inflates FD, so check the numbers rather
 than relying only on the flag.
 
+### Saving confound regressors (optional)
+
+To use the confounds elsewhere (e.g. as nuisance regressors in your own GLM), add
+`--save-confounds` and choose how many terms of each kind to keep:
+
+```bash
+python motion_qc.py /scratch5/$USER/<project>/derivatives/fmriprep --task rest \
+    --save-confounds /scratch5/$USER/<project>/derivatives/confounds \
+    --motion full --wm-csf full --global-signal basic
+```
+
+| Level | Includes | Motion | WM/CSF |
+|-------|----------|--------|--------|
+| `basic` | original parameters | 6 | 2 |
+| `power2` | + quadratic terms | 12 | 4 |
+| `derivatives` | + 1st temporal derivatives | 12 | 4 |
+| `full` | + derivatives, quadratic terms, and squared derivatives | 24 | 8 |
+
+Defaults are `--motion full --wm-csf basic`, no global signal, plus fMRIPrep's
+cosine high-pass regressors (leave them out with `--no-high-pass`). For each run it
+writes `<run>_desc-<choice>_confounds.tsv` (one column per regressor) and a `.json`
+listing the settings and column names.
+
 ## Step 2: connectomes
 
 Edit the paths under `EDIT THESE` in `run_connectome.sh`, set `--array`, then:
