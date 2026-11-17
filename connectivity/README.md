@@ -1,4 +1,4 @@
-# Functional connectivity with Nilearn
+# Denoising and Functional connectivity of rs-fMRI data with Nilearn
 
 > This chapter extends the [main guide](../README.md): it starts from fMRIPrep outputs
 > and is still being developed. Scripts and defaults may change — check the
