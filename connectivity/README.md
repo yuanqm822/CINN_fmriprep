@@ -1,4 +1,4 @@
-# Functional connectivity with Nilearn (in development)
+# Functional connectivity with Nilearn
 
 > This chapter extends the [main guide](../README.md): it starts from fMRIPrep outputs
 > and is still being developed. Scripts and defaults may change — check the
@@ -18,9 +18,8 @@ fMRIPrep); change `SUBJECTS=` in a script to use another list.
 
 After fMRIPrep, `run_connectome.sh` denoises the preprocessed resting-state data and
 computes a functional connectome for each run, following the workflow of
-Wang et al. (2024). It uses `nilearn/1.0`, a CINN Python environment (built with
-pixi) that contains Nilearn and TemplateFlow, so there is no conda environment to
-set up. The Schaefer 2018 atlases are pre-downloaded to the shared TemplateFlow
+Wang et al. (2024). It uses `nilearn/1.0`, a Python environment (built with
+pixi) that contains Nilearn and TemplateFlow. The Schaefer 2018 atlases are pre-downloaded to the shared TemplateFlow
 folder.
 
 For each run it:
@@ -42,7 +41,7 @@ Wang et al. (2024). A run is flagged if mean framewise displacement (FD) is abov
 seconds on the login node:
 
 ```bash
-module load nilearn/1.0
+module load nilearn
 python motion_qc.py /scratch5/$USER/<project>/derivatives/fmriprep --task rest
 ```
 
@@ -75,6 +74,8 @@ Choose the denoising strategy in the `OPTIONS` line:
 Other options: `--atlas 100|200|300|400|...` (Schaefer parcels, 7 networks) and
 `--task` (default `rest`). One-off changes can also be passed at submission, e.g.
 `sbatch run_connectome.sh --atlas 200`.
+
+The choice of denoising strategy depends on your data and the type of your further analysis. There is no right or wrong answer. I recommend you seek advise before proceeding any of the choice.
 
 Outputs in your connectome folder, per run:
 
