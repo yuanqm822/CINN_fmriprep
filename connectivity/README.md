@@ -95,7 +95,7 @@ for s in "--strategy baseline" \
 done
 ```
 
-## Step 3: group benchmark (whole sample)
+## Step 3: group benchmark (if you wish to test different strategies)
 
 Once motion QC and connectomes are done for **all** subjects, `run_group_metrics.sh`
 compares the strategies with the four metrics from Wang et al. (2024):
