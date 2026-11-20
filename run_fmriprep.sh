@@ -55,5 +55,3 @@ fmriprep "$BIDS" "$OUT" participant \
     --skip-bids-validation \
     "${EXTRA_ARGS[@]}" \
     "$@"
-
-echo "Finished sub-$SUB at $(date)"
