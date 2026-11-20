@@ -39,5 +39,3 @@ echo "Connectome for sub-$SUB on $(hostname) at $(date)"
 echo "Options: ${OPTIONS[*]} $*"
 
 python "${SLURM_SUBMIT_DIR:-.}/connectome.py" "$FMRIPREP" "$SUB" "$OUT" "${OPTIONS[@]}" "$@"
-
-echo "Finished sub-$SUB at $(date)"
