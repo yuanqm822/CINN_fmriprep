@@ -44,5 +44,3 @@ mriqc "$BIDS" "$OUT" participant \
     --no-sub \
     "${EXTRA_ARGS[@]}" \
     "$@"
-
-echo "Finished sub-$SUB at $(date)"
